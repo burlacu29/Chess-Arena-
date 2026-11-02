@@ -1,0 +1,18 @@
+'use client';
+import { useState } from 'react';
+import { Chess } from 'chess.js';
+const icons:Record<string,string>={wK:'♔',wQ:'♕',wR:'♖',wB:'♗',wN:'♘',wP:'♙',bK:'♚',bQ:'♛',bR:'♜',bB:'♝',bN:'♞',bP:'♟'};
+const demoTournaments=[{name:'Arena Blitz',fee:0,players:12,max:16,mode:'3+2'},{name:'Rapid Cup',fee:0,players:6,max:16,mode:'10+0'},{name:'Pro Challenge',fee:10,players:0,max:32,mode:'5+3'}];
+export default function Home(){
+ const [game,setGame]=useState(()=>new Chess());const [selected,setSelected]=useState<string|null>(null);const [history,setHistory]=useState<string[]>([]);const [joined,setJoined]=useState<string[]>([]);const [tab,setTab]=useState<'play'|'tournaments'|'wallet'>('play');
+ const moves=selected?game.moves({square:selected as any,verbose:true}).map(m=>m.to):[];
+ const click=(square:string)=>{if(selected&&moves.includes(square)){const copy=new Chess(game.fen());const move=copy.move({from:selected,to:square,promotion:'q'});if(move){setHistory(h=>[...h,game.fen()]);setGame(copy);}setSelected(null);return;}const piece=game.get(square as any);setSelected(piece&&piece.color===game.turn()?square:null);};
+ const undo=()=>{if(!history.length)return;setGame(new Chess(history[history.length-1]));setHistory(h=>h.slice(0,-1));setSelected(null)};
+ const restart=()=>{setGame(new Chess());setHistory([]);setSelected(null)};
+ const status=game.isCheckmate()?'Șah-mat!':game.isDraw()?'Remiză':`${game.turn()==='w'?'Albul':'Negrul'} mută${game.isCheck()?' — ȘAH':''}`;
+ return <main><header><h1>♞ Chess Arena <small>România</small></h1><span>Prototype v0.1 · fără bani reali</span></header><nav>{(['play','tournaments','wallet'] as const).map(x=><button className={tab===x?'active':''} key={x} onClick={()=>setTab(x)}>{x==='play'?'Joacă':x==='tournaments'?'Turnee':'Portofel demo'}</button>)}</nav>
+ {tab==='play'&&<section><h2>Partidă locală — doi jucători</h2><p>{status}</p><div className="board">{game.board().flatMap((row,r)=>row.map((p,c)=>{const s='abcdefgh'[c]+(8-r);return <button key={s} aria-label={s} onClick={()=>click(s)} className={`square ${(r+c)%2?'dark':'light'} ${selected===s?'selected':''} ${moves.includes(s)?'target':''}`}><span className={p?.color==='w'?'whitepiece':'blackpiece'}>{p?icons[p.color+p.type.toUpperCase()]:''}</span></button>}))}</div><div className="controls"><button onClick={undo} disabled={!history.length}>Înapoi</button><button onClick={restart}>Partidă nouă</button></div><p className="muted">Reguli complete prin chess.js: rocadă, en passant, promovare automată în damă, șah-mat și remiză. Nu există încă adversar online sau ceas de joc.</p></section>}
+ {tab==='tournaments'&&<section><h2>Turnee demonstrative</h2>{demoTournaments.map(t=><article key={t.name}><div><strong>{t.name}</strong><p>{t.mode} · {t.players+(joined.includes(t.name)?1:0)}/{t.max} jucători · {t.fee?`${t.fee} € (indisponibil)`:'Gratuit'}</p></div><button disabled={!!t.fee} onClick={()=>setJoined(a=>a.includes(t.name)?a.filter(x=>x!==t.name):[...a,t.name])}>{t.fee?'Blocat':joined.includes(t.name)?'Retrage înscrierea':'Înscrie-te demo'}</button></article>)}<p className="muted">Înscrierile sunt doar în memoria browserului. Nu se creează turnee reale pe server.</p></section>}
+ {tab==='wallet'&&<section><h2>Portofel — interfață demonstrativă</h2><div className="balance">0,00 €</div><p>Depuneri, retrageri și premii: dezactivate până la aprobarea modelului legal și a procesatorului de plăți.</p><button disabled>Depune</button> <button disabled>Retrage</button></section>}
+ <footer>Chess Arena · Modul 1: prototip local · Fără conturi reale, fonduri sau matchmaking</footer></main>
+}
