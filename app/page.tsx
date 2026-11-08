@@ -1,4 +1,9 @@
 "use client";
+import * as THREE from "three";
+import { Suspense, useMemo } from "react";
+import { useGLTF } from "@react-three/drei";
+
+import { royalZen } from "./styles/royalZen";
 
 import { useState } from "react";
 import { Chess } from "chess.js";
@@ -11,41 +16,70 @@ const names: Record<string, string> = {
 p: "P", r: "R", n: "N", b: "B", q: "Q", k: "K"
 };
 
+
+
+
+
+
+const CHESS_MODELS: Record<string, string> = {
+  k: "01_king",
+  q: "03_queen",
+  b: "05_bishop",
+  n: "07_knight",
+  r: "09_rook",
+  p: "11_pawn",
+};
+
+function PremiumModel({ url }: { url: string }) {
+  const { scene } = useGLTF(url);
+  const model = useMemo(() => {
+    const copy = scene.clone(true);
+    copy.traverse((object) => {
+      if (object instanceof THREE.Mesh) {
+        object.material = Array.isArray(object.material)
+          ? object.material.map((m) => m.clone())
+          : object.material.clone();
+        object.castShadow = true;
+        object.receiveShadow = true;
+      }
+    });
+    const bounds = new THREE.Box3().setFromObject(copy);
+    const size = bounds.getSize(new THREE.Vector3());
+    const center = bounds.getCenter(new THREE.Vector3());
+    const scale = 0.85 / Math.max(size.x, size.z, 0.001);
+    copy.position.set(-center.x, -bounds.min.y, -center.z);
+    const holder = new THREE.Group();
+    holder.add(copy);
+    holder.scale.setScalar(scale);
+    return holder;
+  }, [scene]);
+  return <primitive object={model} />;
+}
+
 function Piece({ type, color, x, z, onClick }: {
-type: string; color: string; x: number; z: number;
-onClick: () => void;
+  type: string;
+  color: string;
+  x: number;
+  z: number;
+  onClick: () => void;
 }) {
-const white = color === "w";
-const main = white ? "#e9e4d6" : "#26384a";
-const metal = white ? "#b9a77c" : "#718da4";
-const height = type === "p" ? 0.56 : type === "k" ? 1.12 : 0.85;
-return (
-<group position={[x, 0.12, z]} onClick={(e) => {
-e.stopPropagation(); onClick();
-}}>
-<mesh position={[0, 0.10, 0]}>
-<cylinderGeometry args={[0.34, 0.39, 0.2, 32]} />
-<meshStandardMaterial color={metal} metalness={0.65} roughness={0.25}/>
-</mesh>
-<mesh position={[0, height / 2 + 0.13, 0]}>
-<cylinderGeometry args={[0.19, 0.30, height, 32]}/>
-<meshStandardMaterial color={main} metalness={0.35} roughness={0.3}/>
-</mesh>
-<mesh position={[0, height + 0.15, 0]}>
-<sphereGeometry args={[type === "p" ? 0.19 : 0.25, 24, 16]}/>
-<meshStandardMaterial color={metal} metalness={0.6} roughness={0.2}/>
-</mesh>
-<Text
-position={[0, height + 0.15, 0.255]}
-fontSize={0.27}
-color={white ? "#182637" : "#ffffff"}
-anchorX="center"
-anchorY="middle"
->
-{names[type]}
-</Text>
-</group>
-);
+  const base = CHESS_MODELS[type];
+  const number = Number(base.slice(0, 2)) + (color === "b" ? 1 : 0);
+  const filename = String(number).padStart(2, "0") + base.slice(2);
+  const url = "/models/chess/" + filename + "_" +
+    (color === "w" ? "light" : "dark") + ".glb";
+
+  return (
+    <group position={[x, 0.09, z]}
+      onClick={(event) => {
+        event.stopPropagation();
+        onClick();
+      }}>
+      <Suspense fallback={null}>
+        <PremiumModel url={url} />
+      </Suspense>
+    </group>
+  );
 }
 
 function Board({ game, selected, play }: {
@@ -68,8 +102,8 @@ onClick={(e) => { e.stopPropagation(); play(square); }}
 >
 <boxGeometry args={[1, 0.16, 1]}/>
 <meshStandardMaterial
-color={selected === square ? "#e3b85c" : light ? "#ead4a5" : "#08090c"}
-roughness={0.08} metalness={0.28}
+color={selected === square ? "#e5b85a" : light ? "#e5d5b4" : "#302c2b"}
+roughness={0.13} metalness={0.38}
 />
 </mesh>
 {piece && (
@@ -87,22 +121,35 @@ onClick={() => play(square)}
 }
  return (
 <>
-<color attach="background" args={["#101a27"]}/>
-<ambientLight intensity={1.5}/>
+<color attach="background" args={[royalZen.background]}/>
+
+      {/* royal-zen-light */}
+      <ambientLight intensity={0.75} color="#ffe8c2" />
+      <directionalLight
+        position={[3, 9, 5]}
+        intensity={2.1}
+        color="#ffd49a"
+      />
+      <pointLight
+        position={[-4, 5, 2]}
+        intensity={28}
+        color="#ffbd70"
+      />
+<ambientLight intensity={1.05}/>
 <directionalLight position={[4, 10, 5]} intensity={2.6}/>
 <pointLight position={[-5, 5, -3]} intensity={45} color="#7ec9ff"/>
 <mesh position={[0, -0.075, 0]}>
   <boxGeometry args={[8.22, 0.035, 8.22]} />
-  <meshStandardMaterial color="#d4a64b" metalness={0.85} roughness={0.12} />
+  <meshStandardMaterial color="#c89545" metalness={0.4} roughness={0.12} />
 </mesh>
 <RoundedBox args={[8.5, 0.4, 8.5]} radius={0.12} position={[0, -0.28, 0]}>
-<meshStandardMaterial color="#08090c" metalness={0.65} roughness={0.08}/>
+<meshStandardMaterial color="#27170f" metalness={0.4} roughness={0.12}/>
 </RoundedBox>
 {squares}
 <OrbitControls  
 enablePan={false}  
-minDistance={9}  
-maxDistance={17}  
+minDistance={5.5}  
+maxDistance={15}  
 minPolarAngle={0.35}  
 maxPolarAngle={1.35}  
 />
@@ -173,7 +220,7 @@ fontFamily: "Arial, sans-serif"
     overflow: "hidden",  
     border: "1px solid #40566b"  
   }}>  
-    <Canvas camera={{ position: [0, 10, 10], fov: 48 }}>  
+    <Canvas camera={{ position: [0, 10.5, 12.5], fov: 42 }}>  
       <Board game={game} selected={selected} play={play}/>  
     </Canvas>  
   </section>  
@@ -208,7 +255,7 @@ fontFamily: "Arial, sans-serif"
         display: "block", marginTop: 10,  
         padding: 12, borderRadius: 8,  
         width: "100%", maxWidth: 260,  
-        background: "#101a27", color: "white",  
+        background: "#181410", color: "white",  
         border: "1px solid #50677c"  
       }}  
     />  
