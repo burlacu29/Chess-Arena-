@@ -1,0 +1,114 @@
+/*!****************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[10].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[10].use[3]!./app/royalClassicBackground.css ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************/
+
+/* ROYAL CLASSIC - PROFUNZIME */
+
+.royal-classic-room {
+  position: relative !important;
+  isolation: isolate;
+  overflow: hidden !important;
+  background: #100907 !important;
+}
+
+/* Incăperea: veioza, planta, biblioteca */
+.royal-classic-room::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  background:
+    radial-gradient(
+      ellipse at 16% 30%,
+      rgba(255, 172, 74, 0.13),
+      transparent 38%
+    ),
+    radial-gradient(
+      ellipse at 85% 27%,
+      rgba(225, 142, 55, 0.12),
+      transparent 40%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(10, 5, 3, 0.03),
+      rgba(12, 6, 4, 0.12)
+    ),
+    url("/backgrounds/royal-classic-room-clean.jpg")
+      center center / cover no-repeat;
+
+  filter:
+    contrast(1.17)
+    saturate(1.15);
+}
+
+/* Marmura continua, cu perspectiva */
+.royal-classic-room::after {
+  content: "";
+  position: absolute;
+  top: 43%;
+  bottom: -30%;
+  left: -15%;
+  width: 130%;
+  z-index: 1;
+  pointer-events: none;
+
+  transform-origin: center top;
+  transform:
+    perspective(1000px)
+    rotateX(22deg)
+    scale(1.08);
+
+  background:
+    radial-gradient(
+      ellipse at 18% 20%,
+      rgba(201, 116, 41, 0.24),
+      transparent 48%
+    ),
+    radial-gradient(
+      ellipse at 84% 24%,
+      rgba(203, 129, 51, 0.18),
+      transparent 45%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(12, 6, 4, 0.26),
+      rgba(9, 5, 4, 0.48)
+    ),
+    url("/backgrounds/royal-classic-marble.jpg")
+      center center / cover no-repeat;
+
+  background-blend-mode:
+    screen, screen, multiply, normal;
+
+  filter:
+    sepia(0.85)
+    saturate(1.45)
+    brightness(0.52)
+    contrast(1.35);
+
+  -webkit-mask-image:
+    linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 14%,
+      black 100%
+    );
+
+  mask-image:
+    linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 14%,
+      black 100%
+    );
+}
+
+/* Tabla 3D ramane deasupra decorului */
+.royal-classic-room canvas {
+  position: relative !important;
+  z-index: 2;
+  background: transparent !important;
+}
+

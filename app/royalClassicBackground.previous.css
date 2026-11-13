@@ -1,0 +1,18 @@
+
+.royal-classic-room {
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(17, 9, 6, 0.18),
+      rgba(10, 5, 4, 0.3)
+    ),
+    url("/backgrounds/royal-classic-marble.jpg")
+      center bottom / 100% 34% no-repeat,
+    url("/backgrounds/royal-classic-library.jpg")
+      center center / cover no-repeat
+    !important;
+}
+
+.royal-classic-room canvas {
+  background: transparent !important;
+}

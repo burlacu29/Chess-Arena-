@@ -1,0 +1,38 @@
+
+.royal-classic-room {
+  position: relative !important;
+  overflow: hidden !important;
+  background:
+    url("/backgrounds/royal-classic-room-clean.jpg")
+    center center / cover no-repeat !important;
+}
+
+.royal-classic-room::before {
+  content: "";
+  position: absolute;
+  top: 41%;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      rgba(8, 5, 4, 0.20),
+      rgba(8, 5, 4, 0.35)
+    ),
+    url("/backgrounds/royal-classic-marble.jpg")
+    center / cover no-repeat;
+
+  -webkit-mask-image:
+    linear-gradient(to bottom, transparent, black 18%);
+  mask-image:
+    linear-gradient(to bottom, transparent, black 18%);
+}
+
+.royal-classic-room canvas {
+  position: relative !important;
+  z-index: 1;
+  background: transparent !important;
+}

@@ -1,0 +1,9 @@
+
+.royal-classic-room {
+  background: url("/backgrounds/royal-classic-room-clean.jpg")
+    center center / cover no-repeat !important;
+}
+
+.royal-classic-room canvas {
+  background: transparent !important;
+}

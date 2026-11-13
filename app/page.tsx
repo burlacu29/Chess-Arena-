@@ -1,4 +1,6 @@
 "use client";
+import "./royalClassicBackground.css";
+
 import * as THREE from "three";
 import { Suspense, useMemo } from "react";
 import { useGLTF } from "@react-three/drei";
@@ -101,10 +103,7 @@ position={[x, 0, z]}
 onClick={(e) => { e.stopPropagation(); play(square); }}
 >
 <boxGeometry args={[1, 0.16, 1]}/>
-<meshStandardMaterial
-color={selected === square ? "#e5b85a" : light ? "#e5d5b4" : "#302c2b"}
-roughness={0.13} metalness={0.38}
-/>
+<meshBasicMaterial color={selected === square ? "#E6B66E" : (file + rank) % 2 === 0 ? "#C18A52" : "#24110B"} />
 </mesh>
 {piece && (
 <Piece
@@ -121,7 +120,7 @@ onClick={() => play(square)}
 }
  return (
 <>
-<color attach="background" args={[royalZen.background]}/>
+
 
       {/* royal-zen-light */}
       <ambientLight intensity={0.75} color="#ffe8c2" />
@@ -145,7 +144,75 @@ onClick={() => play(square)}
 <RoundedBox args={[8.5, 0.4, 8.5]} radius={0.12} position={[0, -0.28, 0]}>
 <meshStandardMaterial color="#27170f" metalness={0.4} roughness={0.12}/>
 </RoundedBox>
-{squares}
+
+      {/* CHESS_ARENA_THICK_SIDE */}
+      <RoundedBox
+        args={[8.55, 0.78, 8.55]}
+        radius={0.08}
+        smoothness={5}
+        position={[0, -0.51, 0]}
+        castShadow
+        receiveShadow
+      >
+        <meshPhysicalMaterial
+          color="#160B09"
+          roughness={0.08}
+          metalness={0.22}
+          clearcoat={1}
+ clearcoatRoughness={0.04}
+          emissive="#382018"
+          emissiveIntensity={0.08}
+        />
+      </RoundedBox>
+      {/* CHESS_ARENA_BOTTOM_EDGE */}
+      {[
+        [0, -0.895, 4.277, 8.25, 0.018, 0.012],
+        [0, -0.895, -4.277, 8.25, 0.018, 0.012],
+        [4.277, -0.895, 0, 0.012, 0.018, 8.25],
+        [-4.277, -0.895, 0, 0.012, 0.018, 8.25],
+      ].map(([x, y, z, w, h, d], i) => (
+        <mesh key={"bottom-gold-" + i} position={[x, y, z]}>
+          <boxGeometry args={[w, h, d]} />
+          <meshStandardMaterial
+            color="#C59A62"
+            emissive="#A06B36"
+            emissiveIntensity={0.32}
+            metalness={0.6}
+            roughness={0.1}
+          />
+        </mesh>
+      ))}
+
+
+      <RoundedBox
+        args={[8.62, 0.055, 8.62]}
+        radius={0.025}
+        smoothness={4}
+        position={[0, -0.13, 0]}
+      >
+        <meshStandardMaterial
+          color="#B77B37"
+          metalness={0.7}
+          roughness={0.23}
+        />
+      </RoundedBox>
+
+ 
+      {/* CHESS_ARENA_SIDE_LIGHTS */}
+      <ambientLight color="#D9A66F" intensity={0.22} />
+
+      <directionalLight
+        position={[6, 2, 5]}
+        color="#FFC88D"
+        intensity={0.65}
+      />
+      <directionalLight
+        position={[-6, 2, -5]}
+        color="#FFC88D"
+        intensity={0.65}
+      />
+
+      {squares}
 <OrbitControls  
 enablePan={false}  
 minDistance={5.5}  
@@ -220,7 +287,7 @@ fontFamily: "Arial, sans-serif"
     overflow: "hidden",  
     border: "1px solid #40566b"  
   }}>  
-    <Canvas camera={{ position: [0, 10.5, 12.5], fov: 42 }}>  
+    <Canvas onCreated={({ gl, scene }) => { scene.background = null; gl.setClearColor("#000000", 0); }} gl={{ alpha: true }} className="royal-classic-room" camera={{ position: [0, 10.5, 12.5], fov: 42 }}>  
       <Board game={game} selected={selected} play={play}/>  
     </Canvas>  
   </section>  
